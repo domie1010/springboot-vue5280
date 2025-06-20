@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ShijianrenshuDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.qiye_id as qiyeId
+        ,a.shijianrenshu_name as shijianrenshuName
+        ,a.shijianrenshu_uuid_number as shijianrenshuUuidNumber
+        ,a.shijianrenshu_photo as shijianrenshuPhoto
+        ,a.shijianrenshu_types as shijianrenshuTypes
+        ,a.shijianrenshu_clicknum as shijianrenshuClicknum
+        ,a.shijianrenshu_text as shijianrenshuText
+        ,a.shijianrenshu_content as shijianrenshuContent
+        ,a.renwuzhuangtai_types as renwuzhuangtaiTypes
+        ,a.shangxia_types as shangxiaTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ShijianrenshuView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,qiye.qiye_name as qiyeName
+        ,qiye.qiye_lianxiren as qiyeLianxiren
+        ,qiye.qiye_phone as qiyePhone
+        ,qiye.qiye_photo as qiyePhoto
+        ,qiye.qiye_address as qiyeAddress
+        ,qiye.qiye_email as qiyeEmail
+        ,qiye.hangye_types as hangyeTypes
+
+        FROM shijianrenshu  a
+        left JOIN qiye qiye ON a.qiye_id = qiye.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.qiyeId != null and params.qiyeId != ''">
+                and (
+                    a.qiye_id = #{params.qiyeId}
+                )
+            </if>
+            <if test=" params.shijianrenshuName != '' and params.shijianrenshuName != null and params.shijianrenshuName != 'null' ">
+                and a.shijianrenshu_name like CONCAT('%',#{params.shijianrenshuName},'%')
+            </if>
+            <if test=" params.shijianrenshuUuidNumber != '' and params.shijianrenshuUuidNumber != null and params.shijianrenshuUuidNumber != 'null' ">
+                and a.shijianrenshu_uuid_number like CONCAT('%',#{params.shijianrenshuUuidNumber},'%')
+            </if>
+            <if test="params.shijianrenshuTypes != null and params.shijianrenshuTypes != ''">
+                and a.shijianrenshu_types = #{params.shijianrenshuTypes}
+            </if>
+            <if test="params.shijianrenshuClicknumStart != null and params.shijianrenshuClicknumStart != ''">
+                <![CDATA[  and a.shijianrenshu_clicknum >= #{params.shijianrenshuClicknumStart}   ]]>
+            </if>
+            <if test="params.shijianrenshuClicknumEnd != null and params.shijianrenshuClicknumEnd != ''">
+                <![CDATA[  and a.shijianrenshu_clicknum <= #{params.shijianrenshuClicknumEnd}   ]]>
+            </if>
+             <if test="params.shijianrenshuClicknum != null and params.shijianrenshuClicknum != ''">
+                and a.shijianrenshu_clicknum = #{params.shijianrenshuClicknum}
+             </if>
+            <if test=" params.shijianrenshuText != '' and params.shijianrenshuText != null and params.shijianrenshuText != 'null' ">
+                and a.shijianrenshu_text like CONCAT('%',#{params.shijianrenshuText},'%')
+            </if>
+            <if test=" params.shijianrenshuContent != '' and params.shijianrenshuContent != null and params.shijianrenshuContent != 'null' ">
+                and a.shijianrenshu_content like CONCAT('%',#{params.shijianrenshuContent},'%')
+            </if>
+            <if test="params.renwuzhuangtaiTypes != null and params.renwuzhuangtaiTypes != ''">
+                and a.renwuzhuangtai_types = #{params.renwuzhuangtaiTypes}
+            </if>
+            <if test="params.shangxiaTypes != null and params.shangxiaTypes != ''">
+                and a.shangxia_types = #{params.shangxiaTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断企业的id不为空 -->
+            <if test=" params.qiyeIdNotNull != '' and params.qiyeIdNotNull != null and params.qiyeIdNotNull != 'null' ">
+                and a.qiye_id IS NOT NULL
+            </if>
+            <if test=" params.qiyeName != '' and params.qiyeName != null and params.qiyeName != 'null' ">
+                and qiye.qiye_name like CONCAT('%',#{params.qiyeName},'%')
+            </if>
+            <if test=" params.qiyeLianxiren != '' and params.qiyeLianxiren != null and params.qiyeLianxiren != 'null' ">
+                and qiye.qiye_lianxiren like CONCAT('%',#{params.qiyeLianxiren},'%')
+            </if>
+            <if test=" params.qiyePhone != '' and params.qiyePhone != null and params.qiyePhone != 'null' ">
+                and qiye.qiye_phone like CONCAT('%',#{params.qiyePhone},'%')
+            </if>
+            <if test=" params.qiyeAddress != '' and params.qiyeAddress != null and params.qiyeAddress != 'null' ">
+                and qiye.qiye_address like CONCAT('%',#{params.qiyeAddress},'%')
+            </if>
+            <if test=" params.qiyeEmail != '' and params.qiyeEmail != null and params.qiyeEmail != 'null' ">
+                and qiye.qiye_email like CONCAT('%',#{params.qiyeEmail},'%')
+            </if>
+            <if test="params.hangyeTypes != null  and params.hangyeTypes != ''">
+                and qiye.hangye_types = #{params.hangyeTypes}
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
